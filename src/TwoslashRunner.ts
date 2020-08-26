@@ -12,23 +12,31 @@ export enum RunState {
 
 type StatefulCodeblock = {
   start: number
+  end: number
   state: RunState
   knownErrors?: import("@typescript/twoslash").TwoSlashReturn["errors"]
   errMessage?: string
 };
 
+type RunOnBlock = (block: StatefulCodeblock) => void
 export class TwoslashRunner {
   #runningTwoslashSamples: StatefulCodeblock[] = [];
   public codeLensDidChange!: vscode.EventEmitter<void>;
 
-  stateForSampleAtStart(start: number): StatefulCodeblock | undefined {
-    const sample = this.#runningTwoslashSamples.find((cb) => cb.start === start);
+  forEachCodeBlock(block: RunOnBlock): void{
+    this.#runningTwoslashSamples.forEach(block);
+  }
+
+  stateForSampleAtPosition(position: number): StatefulCodeblock | undefined {
+    const sample = this.#runningTwoslashSamples.find((cb) => cb.start <= position && position <= cb.end);
     if(!sample) return
     return sample
   }
 
   addCodeblock(block: Codeblock) {
-    this.#runningTwoslashSamples.push({ state: RunState.NotRan, start: block.start });
+    const sample = { state: RunState.NotRan, start: block.start, end: block.end }
+    console.log(sample)
+    this.#runningTwoslashSamples.push(sample);
   }
 
   removeCodeblock(block: Codeblock) {
@@ -66,7 +74,7 @@ export class TwoslashRunner {
     const workspaceRoot = workspace.uri.toString().replace("file://", "")
 
     const theirTS = require(workspaceRoot +  "/node_modules/typescript")
-    if(!theirTS) {
+    if (!theirTS) {
       return vscode.window.showInformationMessage("Twoslash: Could not resolve project's TS version");
     }
 
@@ -76,12 +84,15 @@ export class TwoslashRunner {
       statefulCodeblock.state = RunState.Success
       statefulCodeblock.errMessage = undefined
       statefulCodeblock.knownErrors = r.errors
+      console.log(r)
     } catch (error) {
       // doesn't have errors for example
       statefulCodeblock.state = RunState.TwoslashErr
       statefulCodeblock.errMessage = error.message
+      console.log(error)
     }
 
     this.codeLensDidChange.fire()
   }
+
 }

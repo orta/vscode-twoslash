@@ -1,13 +1,17 @@
 {
   "name": "vscode-twoslash",
-  "displayName": "vscode-twoslash",
+  "displayName": "Twoslash in Markdown",
   "description": "Verify twoslash code samples in your IDE",
-  "version": "0.5.0",
+  "publisher": "Orta",
+  "version": "0.6.0",
+  "repository": {
+    "url": "https://github.com/orta/vscode-twoslash.git"
+  },
   "engines": {
     "vscode": "^1.48.0"
   },
   "categories": [
-    "Other"
+    "Linters"
   ],
   "activationEvents": [
     "onLanguage:markdown"
