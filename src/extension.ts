@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { getCodeblocks } from "./getCodeblocks";
 import { SnapshotCodeLensProvider } from "./TwoslashCodeLens";
 import { RunState, TwoslashRunner } from "./TwoslashRunner";
 
@@ -17,12 +18,38 @@ export function activate(context: vscode.ExtensionContext) {
   const  addTwoslashD = vscode.commands.registerCommand("vscode-twoslash.addTwoslashCodeblock", (codeblock) => {
     runner.addCodeblock(codeblock);
     codelens.onDidChange.fire()
+
+    runner.runSampleAt(codeblock.start + 3);
   });
 
   const removeTwoslashD = vscode.commands.registerCommand("vscode-twoslash.removeTwoslashCodeblock", (codeblock) => {
     runner.removeCodeblock(codeblock);
     codelens.onDidChange.fire()
   });
+
+  const clearD = vscode.commands.registerCommand("vscode-twoslash.clearAllMonitors", (codeblock) => {
+    const starts: number[] = []
+    runner.forEachCodeBlock(cb => {
+      starts.push(cb.start + 3)
+    })
+    starts.forEach(s => runner.removeCodeblock(s))
+  });
+
+
+  // Set up some commands which the buttons run
+  const  monitorAll = vscode.commands.registerCommand("vscode-twoslash.runOnAll", () => {
+    const document = vscode.window.activeTextEditor?.document
+    if (!document) return
+
+    const allBlocks = getCodeblocks(document)
+    allBlocks.forEach(codeblock => {
+      runner.addCodeblock(codeblock);
+      runner.runSampleAt(codeblock.start + 3);
+    });
+
+    codelens.onDidChange.fire()
+  });
+
 
   // Monitor when a user presses save to trigger running twoslash on the selected code sample
   const  saveD = vscode.workspace.onDidSaveTextDocument((e) => {
@@ -54,30 +81,8 @@ export function activate(context: vscode.ExtensionContext) {
     }
   });
 
-
-  // // // Provides a hover with the full info for exceptions
-  // const colorDispose = vscode.languages.registerDocumentHighlightProvider('markdown', {
-  //   provideDocumentHighlights(document, provider) {
-  //     const colors: vscode.DocumentHighlight[] = []
-  //     runner.forEachCodeBlock(block => {
-  //       if (block.state === RunState.TwoslashErr) {
-  //         const start = document.positionAt(block.start)
-  //         const end = document.positionAt(block.end)
-  //         colors.push({ 
-
-  //           kind: { }
-  //           range: new vscode.Range(start, end) 
-  //         })
-  //       } 
-  //     })
-  //     return colors
-  //   },
-
-  // });
-
-
   // Essential faff
-  context.subscriptions.push(addTwoslashD, saveD, codelensD, removeTwoslashD, hoverDispose);
+  context.subscriptions.push(addTwoslashD, saveD, codelensD, removeTwoslashD, hoverDispose, monitorAll, clearD);
 }
 
 export function deactivate() {}

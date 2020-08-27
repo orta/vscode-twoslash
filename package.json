@@ -3,7 +3,7 @@
   "displayName": "Twoslash in Markdown",
   "description": "Verify twoslash code samples in your IDE",
   "publisher": "Orta",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "repository": {
     "url": "https://github.com/orta/vscode-twoslash.git"
   },
@@ -16,6 +16,18 @@
   "activationEvents": [
     "onLanguage:markdown"
   ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "vscode-twoslash.runOnAll",
+        "title": "Twoslash: Monitor all samples on this file"
+      },
+      {
+        "command": "vscode-twoslash.clearAllMonitors",
+        "title": "Twoslash: Stop monitoring all codeblocks"
+      }
+    ]
+  },
   "main": "./out/extension.js",
   "scripts": {
     "vscode:prepublish": "yarn run compile",
