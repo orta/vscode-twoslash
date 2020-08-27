@@ -28,9 +28,9 @@ export function activate(context: vscode.ExtensionContext) {
   });
 
   const clearD = vscode.commands.registerCommand("vscode-twoslash.clearAllMonitors", (codeblock) => {
-    const starts: number[] = []
+    const starts: any[] = []
     runner.forEachCodeBlock(cb => {
-      starts.push(cb.start + 3)
+      starts.push(cb)
     })
     starts.forEach(s => runner.removeCodeblock(s))
   });
