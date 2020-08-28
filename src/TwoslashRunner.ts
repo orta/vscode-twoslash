@@ -35,7 +35,6 @@ export class TwoslashRunner {
 
   addCodeblock(block: Codeblock) {
     const sample = { state: RunState.NotRan, start: block.start, end: block.end }
-    console.log(sample)
     this.#runningTwoslashSamples.push(sample);
   }
 
@@ -80,16 +79,16 @@ export class TwoslashRunner {
 
     // Go
     try {
-      const r = twoslasher(selectedCodeblock.code, lang, { tsModule: theirTS, vfsRoot: workspaceRoot })
+      const r = twoslasher(selectedCodeblock.code, lang, { tsModule: theirTS, vfsRoot: workspaceRoot, defaultOptions: { noStaticSemanticInfo: false } })
       statefulCodeblock.state = RunState.Success
       statefulCodeblock.errMessage = undefined
       statefulCodeblock.knownErrors = r.errors
-      console.log(r)
+      // console.log(r)
     } catch (error) {
       // doesn't have errors for example
       statefulCodeblock.state = RunState.TwoslashErr
       statefulCodeblock.errMessage = error.message
-      console.log(error)
+      // console.log(error)
     }
 
     this.codeLensDidChange.fire()
