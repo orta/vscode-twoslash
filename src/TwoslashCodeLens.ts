@@ -6,6 +6,7 @@ export type Codeblock = { lang: string; code: string; block: string; start: numb
 
 const startTwoslashCommand = `vscode-twoslash.addTwoslashCodeblock`;
 const removeTwoslashCommand = `vscode-twoslash.removeTwoslashCodeblock`;
+const openTwoslashCommand = `vscode-twoslash.openTwoslashCodeblock`;
 
 export class SnapshotCodeLensProvider implements vscode.CodeLensProvider {
   onDidChange: vscode.EventEmitter<void>;
@@ -28,7 +29,7 @@ export class SnapshotCodeLensProvider implements vscode.CodeLensProvider {
 
     const twoslashBlocks = getCodeblocks(document);
 
-    const codeLenses= twoslashBlocks.map((snapshot) => {
+    const codeLenses = twoslashBlocks.map((snapshot) => {
       const l = snapshot;
       const startPosition = document.positionAt(l.start + 3 + l.lang.indexOf("twoslash"));
       const endPosition = document.positionAt(l.start + 3 + l.lang.length);
@@ -70,7 +71,12 @@ export class SnapshotCodeLensProvider implements vscode.CodeLensProvider {
         };
       }
 
-      return new vscode.CodeLens(range, command);
+      const workbench = {
+          title: "Workbench",
+          command: openTwoslashCommand,
+          arguments: [snapshot],
+      }
+      return [new vscode.CodeLens(range, workbench),new vscode.CodeLens(range, command)];
     });
 
     this.previousDecorators.forEach((pd => {
@@ -78,7 +84,7 @@ export class SnapshotCodeLensProvider implements vscode.CodeLensProvider {
     }))
     
     
-    return codeLenses
+    return codeLenses.flat()
   }
 
 }

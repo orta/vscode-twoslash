@@ -64,17 +64,23 @@ export class TwoslashRunner {
     const lang = selectedCodeblock.lang.split(" ")[0].trim()
 
     const workspace = vscode.workspace.getWorkspaceFolder(vscode.window.activeTextEditor.document.uri)
-    if(!workspace) return
+    if (!workspace) return
 
     // TODO: use require.resolve isntead of hardcoding
     // const fsPath = workspace.uri.toString().replace("file://", "")  + "/node_modules"//
     // const theirTS = require.resolve("typescript", { paths: [ fsPath ]})
     
+    
     const workspaceRoot = workspace.uri.toString().replace("file://", "")
+    console.log("vs-twoslash, requiring: " + workspaceRoot +  "/node_modules/typescript")
 
     const theirTS = require(workspaceRoot +  "/node_modules/typescript")
+    console.log("Got something: " + !!theirTS)
+
     if (!theirTS) {
       return vscode.window.showInformationMessage("Twoslash: Could not resolve project's TS version");
+    } else {
+      console.log("Their TS version " + (theirTS as typeof import("typescript")).version)
     }
 
     // Go

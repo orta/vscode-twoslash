@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { getCodeblocks } from "./getCodeblocks";
 import { SnapshotCodeLensProvider } from "./TwoslashCodeLens";
 import { RunState, TwoslashRunner } from "./TwoslashRunner";
+import * as lzstring from "lz-string"
 
 export function activate(context: vscode.ExtensionContext) {
   // Does the work of running twoslash on a particualr code sample
@@ -25,6 +26,11 @@ export function activate(context: vscode.ExtensionContext) {
   const removeTwoslashD = vscode.commands.registerCommand("vscode-twoslash.removeTwoslashCodeblock", (codeblock) => {
     runner.removeCodeblock(codeblock);
     codelens.onDidChange.fire()
+  });
+
+  const openTwoslash = vscode.commands.registerCommand("vscode-twoslash.openTwoslashCodeblock", (codeblock) => {
+    const hash = `#code/${lzstring.compressToEncodedURIComponent(codeblock.code.trim())}`
+    vscode.commands.executeCommand('vscode.open', vscode.Uri.parse('https://www.typescriptlang.org/dev/bug-workbench/' + hash));
   });
 
   const clearD = vscode.commands.registerCommand("vscode-twoslash.clearAllMonitors", (codeblock) => {
@@ -82,7 +88,7 @@ export function activate(context: vscode.ExtensionContext) {
   });
 
   // Essential faff
-  context.subscriptions.push(addTwoslashD, saveD, codelensD, removeTwoslashD, hoverDispose, monitorAll, clearD);
+  context.subscriptions.push(addTwoslashD, saveD, codelensD, removeTwoslashD, hoverDispose, monitorAll, clearD, openTwoslash);
 }
 
 export function deactivate() {}
