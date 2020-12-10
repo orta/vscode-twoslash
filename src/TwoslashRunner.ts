@@ -85,7 +85,7 @@ export class TwoslashRunner {
 
     // Go
     try {
-      const r = twoslasher(selectedCodeblock.code, lang, { tsModule: theirTS, vfsRoot: workspaceRoot, defaultOptions: { noStaticSemanticInfo: false } })
+      const r = twoslasher(selectedCodeblock.code, lang, { tsModule: theirTS, vfsRoot: workspaceRoot, fsMap: new Map(),  defaultOptions: { noStaticSemanticInfo: false } })
       statefulCodeblock.state = RunState.Success
       statefulCodeblock.errMessage = undefined
       statefulCodeblock.knownErrors = r.errors
