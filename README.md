@@ -1,3 +1,7 @@
+# Moved
+
+https://github.com/shikijs/twoslash/blob/main/extensions/vscode-twoslash/
+
 # vscode-twoslash README
 
 Runs Twoslash code samples in your IDE to determine if they are correct.
